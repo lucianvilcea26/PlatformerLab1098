@@ -3,11 +3,6 @@ using UnityEngine.InputSystem;
 
 public class WalkerController : MonoBehaviour
 {
-    private Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;
-    private InputAction moveAction;
-    private float moveInput;
-
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 6f;
 
@@ -21,13 +16,21 @@ public class WalkerController : MonoBehaviour
     private bool jumpRequested;
     private bool isGrounded;
 
+    private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
+    private InputAction moveAction;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
+        Debug.Log($"Awake: rb={rb != null}, sr={spriteRenderer != null}, " +
+                  $"move={moveAction != null}");
     }
+
+    private float moveInput;
 
     void Update()
     {
@@ -40,12 +43,10 @@ public class WalkerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
-
-        bool wasGrounded = isGrounded;
         isGrounded = Physics2D.OverlapCircle(
             groundCheck.position, groundCheckRadius, groundLayer) != null;
-        if (isGrounded != wasGrounded) Debug.Log($"isGrounded -> {isGrounded}");
+
+        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
     }
 
     void OnDrawGizmosSelected()
